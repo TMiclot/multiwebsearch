@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Web Search</title>
+    <style>
+        /* BODY */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #ADD8E6;
+        }
+        
+        /* h1 header*/
+        h1 {
+          font-size: 28px;
+          font-weight: 500;
+          padding-bottom: 15px;
+          position: relative;
+          color: #5cb85c;
+        }
+        h1:before {
+          content: "";
+          position: absolute;
+          left: 0;
+          bottom: 0;
+          height: 5px;
+          width: 55px;
+          background-color: #5cb85c;
+        }
+        h1:after {
+          content: "";
+          position: absolute;
+          left: 0;
+          bottom: 2px;
+          height: 1px;
+          width: 95%;
+          max-width: 255px;
+          background-color: #5cb85c;
+        }
+        
+        /* Search Container Style */
+        .search-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        .search-container input,
+        .search-container select,
+        .search-container button,
+        .search-container textarea,
+        .search-container label {
+            padding: 10px;
+            margin: 5px 0;
+            width: 95%;
+            border: none;
+            border-radius: 4px;
+        }
+        .search-container button {
+            background-color: #5cb85c;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .search-container button:hover {
+            background-color: #4cae4c;
+        }
+        
+        .search-container textarea {
+            height: 100px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        /* Query search bar Style */
+        .query-container{
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        /* Radio Buttons Style */
+        .radio-container {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .radio-container input {
+            margin-right: 10px;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #5cb85c; /* Border color for unchecked */
+            border-radius: 50%;
+            outline: none;
+            cursor: pointer;
+        }
+        .radio-container input:checked {
+            background-color: #5cb85c; /* Fill color when checked */
+        }
+        .radio-container input:checked::before {
+            content: '';
+            display: block;
+            width: 10px;
+            height: 10px;
+            margin: 3px;
+            border-radius: 50%;
+            background-color: #fff; /* Color of the inner dot */
+        }
+        
+        /* Radio Group parameters */
+        .radio-group {
+            display: flex;
+            justify-content: space-between;
+        }
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="search-container">
+        <h1>Multi-Web Search</h1>
+        <div class="query-container">
+            <input class="radio-container" type="text" id="searchQuery" placeholder="Enter search query">
+        </div>
+        <select id="searchEngine"></select>
+        <select id="websiteListSelect" onchange="loadWebsiteList()">
+            <option value="" selected>No list selected</option>
+        </select>
+        <textarea id="websiteList" placeholder="Enter websites, one per line"></textarea>
+        <div class="radio-group">
+            <label class="radio-container">
+                <input type="radio" name="tabOption" value="same"> Open in same tab
+            </label>
+            <label class="radio-container">
+                <input type="radio" name="tabOption" value="new" checked> Open in new tab
+            </label>
+        </div>
+        <button onclick="performSearch()">Search</button>
+    </div>
+    <script>
+        async function populateSearchEngines() {
+            const response = await fetch('/search_engines');
+            const engines = await response.json();
+            const searchEngineSelect = document.getElementById('searchEngine');
+            
+            engines.forEach(engine => {
+                const option = document.createElement('option');
+                option.value = engine.url;
+                option.textContent = engine.name;
+                searchEngineSelect.appendChild(option);
+            });
+        }
+
+        async function populateWebsiteLists() {
+            const response = await fetch('/website_lists');
+            const lists = await response.json();
+            const websiteListSelect = document.getElementById('websiteListSelect');
+            
+            lists.forEach(list => {
+                const option = document.createElement('option');
+                option.value = list;
+                option.textContent = list;
+                websiteListSelect.appendChild(option);
+            });
+        }
+
+        async function loadWebsiteList() {
+            const selectedList = document.getElementById('websiteListSelect').value;
+            if (selectedList) {
+                const response = await fetch(`/website_list?name=${selectedList}`);
+                const websites = await response.text();
+                document.getElementById('websiteList').value = websites.split('\n').filter(line => line.trim() !== "").join('\n');
+            } else {
+                document.getElementById('websiteList').value = '';
+            }
+        }
+
+        window.onload = async () => {
+            await populateSearchEngines();
+            await populateWebsiteLists();
+        };
+
+        function performSearch() {
+            const query = document.getElementById('searchQuery').value;
+            const engine = document.getElementById('searchEngine').value;
+            const websites = document.getElementById('websiteList').value.split('\n');
+
+            const siteQueries = websites.map(site => `site:${site.trim()}`).filter(site => site !== "").join(" OR ");
+            const fullQuery = `${query} ${siteQueries}`;
+            let url = engine + encodeURIComponent(fullQuery);
+
+            const tabOption = document.querySelector('input[name="tabOption"]:checked').value;
+            if (tabOption === 'new') {
+                window.open(url, '_blank');
+            } else {
+                window.location.href = url;
+            }
+        }
+    </script>
+</body>
+</html>
+
