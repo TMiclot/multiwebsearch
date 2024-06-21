@@ -15,9 +15,7 @@ But if you need to reinstall it you can do so using the command `npm install exp
 
 ### 1. Download the repository
 
-Simply copy this github repository: `gh repo clone TMiclot/multiwebsearch`
-
-Or you can also download it as zip file by clicing on the green button `<> Code` then `Download ZIP`. Now you can extrac the zip anywhere you want.
+Simply download and extract `multiwebsearch.tar.gz` anywhere you want.
 
 ### 2. Start the server
 
