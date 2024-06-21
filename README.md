@@ -17,6 +17,8 @@ But if you need to reinstall it you can do so using the command `npm install exp
 
 Simply download and extract `multiwebsearch.tar.gz` anywhere you want.
 
+Alternatively you can copy the `multiwebsearch` directory from this repository. But you will have to install express by yourself.
+
 ### 2. Start the server
 
 Open a terminal, go to the path of *Multi-Web Search*, then start the server using [node](https://nodejs.org/).
