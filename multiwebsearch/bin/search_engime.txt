@@ -1,5 +1,6 @@
 "Google" https://www.google.com/search?q=
 "Qwant" https://www.qwant.com/?q=
+"StartPage" https://www.startpage.com/do/search?query=
 "DuckDuckGo" https://duckduckgo.com/?q=
 "Brave" https://search.brave.com/search?q=
 "Ecosia" https://www.ecosia.org/search?q=
